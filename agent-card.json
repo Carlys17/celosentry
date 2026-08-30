@@ -1,0 +1,20 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "CeloSentry",
+  "description": "Autonomous on-chain security bounty agent for Celo mainnet. Watches Celo ecosystem contracts for exploit signals, triages findings from human researchers and reviewer agents, and settles bounties in cUSD via x402 micropayments. Every transaction carries an ERC-8021 attribution tag.",
+  "image": "https://raw.githubusercontent.com/Carlys17/celosentry/main/logo.svg",
+  "services": [
+    {
+      "name": "web",
+      "endpoint": "https://github.com/Carlys17/celosentry"
+    },
+    {
+      "name": "email",
+      "endpoint": "sipahutarc3@gmail.com"
+    }
+  ],
+  "x402Support": true,
+  "active": true,
+  "registrations": [],
+  "supportedTrust": ["reputation", "crypto-economic"]
+}
