@@ -15,5 +15,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node --test test/
+      - run: node --test test/*.js
       - run: node -e "import('./src/server.js').then(()=>console.log('server module loads OK'))"
