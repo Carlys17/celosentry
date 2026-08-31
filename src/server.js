@@ -26,12 +26,30 @@ export const REPORTS = {
   'R-001': {
     title: 'Unbounded approval drift in Celo ecosystem token distributor',
     severity: 'HIGH',
-    summary: 'Distributor contract allows infinite approvals to drift after role rotation. Full PoC and fix in the paid report.',
+    summary: 'Distributor contract allows infinite approvals to drift after role rotation.',
+    details: `Impact: HIGH. A spender approved by the distributor can retain an unlimited allowance after its operational role is rotated or revoked. If the spender key or contract is compromised, previously approved token balances remain drainable.
+
+Root cause: the role-rotation path updates the authorized spender but does not clear the ERC-20 allowance granted to the old spender. The allowance is not automatically tied to the role membership.
+
+Proof of concept: (1) distributor approves Spender-A for type(uint256).max; (2) administrator rotates the role to Spender-B; (3) Spender-A is no longer an active role holder but allowance(spenderA) remains non-zero; (4) Spender-A can call transferFrom(distributor, attacker, amount) while the distributor has token balance.
+
+Recommended fix: before or during rotation, set allowance(oldSpender, 0), then grant a bounded allowance to the new spender. Prefer an internal allowance wrapper with an explicit revoke step and emit an Approval event for the zeroing operation. Add a regression test covering role rotation, allowance state, and transferFrom after revocation.
+
+Validation checklist: inspect the distributor's allowance for every historical spender, revoke stale approvals, rotate the role, then confirm transferFrom by the old spender reverts. This is a demo finding for the CeloSentry workflow and should be independently validated against the target contract before remediation.`
   },
   'R-002': {
     title: 'cUSD fee-currency rounding leak in x402 facilitator flow',
     severity: 'MEDIUM',
-    summary: 'Rounding direction leaks dust to the caller on partial settlements. Full math and repro in the paid report.',
+    summary: 'Rounding direction leaks dust to the caller on partial settlements.',
+    details: `Impact: MEDIUM. When a facilitator converts a requested fee into token base units, integer division rounds in one direction. Repeated partial settlements can leave a small remainder that is not allocated according to the quoted fee.
+
+Root cause: feeBaseUnits = quotedFee * amount / quoteAmount is truncated without a clearly defined rounding policy. The verification path and settlement path do not use the same remainder handling.
+
+Reproduction: choose a quote whose division is not exact, submit several partial payments, and compare the sum of settled base units with the original quote. The difference is dust per settlement and accumulates over repeated calls. The exact amount depends on token decimals and quote parameters.
+
+Recommended fix: define the rounding direction in the protocol specification, use checked integer arithmetic, and account for the remainder explicitly. Either reject non-exact partial settlements or assign the remainder deterministically to the final settlement. Add property tests asserting conservation of value across split and full payments.
+
+Validation checklist: test zero, one-unit, maximum, and non-divisible quote values; compare verifier output with the actual token transfer; assert that the facilitator cannot create or lose value through repeated partial settlement. This is a demo finding for the CeloSentry workflow and should be independently validated against the target facilitator implementation.`
   },
 };
 
