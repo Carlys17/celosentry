@@ -1,0 +1,16 @@
+{
+  "name": "celosentry",
+  "version": "0.1.0",
+  "description": "Autonomous on-chain security bounty agent for Celo mainnet with x402 micropayments",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "node src/demo.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@celo/attribution-tags": "^0.2.0",
+    "viem": "^2.0.0"
+  }
+}
