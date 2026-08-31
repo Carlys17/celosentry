@@ -162,7 +162,7 @@ async function buyReport(id){
     const txHash = await window.ethereum.request({
       method:'eth_sendTransaction',
       params:[{ from: account, to: CUSD, value:'0x0', data: '0x'+data }]
-    });
+    }).catch(e => { throw new Error('wallet rejected or RPC error: ' + (e.message||JSON.stringify(e))); });
     setStatus('info','Settlement sent: <span class="txlink">'+txHash.slice(0,18)+'…</span> — waiting for confirmation…');
     await waitForTx(txHash);
     setStatus('info','Confirmed on Celo mainnet. Verifying settlement…');
