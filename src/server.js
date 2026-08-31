@@ -8,8 +8,14 @@
 // POST /settle       -> { txHash, from, amount, reportId } verify + unlock
 // GET  /stats        -> leaderboard-facing stats
 import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { verifySettlement, recordSettlement, recordFinding, stats, loadLedger } from './ledger.js';
 import { ATTRIBUTION_TAG, ADDRESSES } from './config.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = path.join(__dirname, 'public');
 
 const PORT = process.env.PORT || 8787;
 const PRICE_CUSD = process.env.PRICE_CUSD || '0.5';
@@ -58,11 +64,21 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
   if (url.pathname === '/' && req.method === 'GET') {
+    // serve the web UI when a browser hits root
+    const accept = (req.headers['accept'] || '').toLowerCase();
+    if (accept.includes('text/html')) {
+      try {
+        const html = fs.readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        return res.end(html);
+      } catch (e) { /* fall through to JSON */ }
+    }
     return json(res, 200, {
       agent: 'CeloSentry',
       erc8004: 'https://8004scan.io/agents/celo/9798',
       attributionTag: ATTRIBUTION_TAG,
       description: 'Security bounty agent - findings for cUSD via x402',
+      ui: 'Open this URL in a browser to use the wallet-based UI',
       stats: stats(),
     });
   }
