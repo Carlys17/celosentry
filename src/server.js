@@ -27,6 +27,23 @@ export function priceWeiForReport(reportId) {
 }
 
 // Demo security reports (would come from the triage pipeline)
+// Simulated targets: report format is complete (project, contract, component,
+// commit) but targets are clearly-labeled demo contracts, not real audits.
+export const TARGETS = {
+  'R-001': { project: 'Simulated Celo TokenDistributor', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa01', network: 'celo-mainnet', component: 'src/distributor/ApprovalStore.sol', commit: 'c0ffee00000000000000000000000000000000001' },
+  'R-002': { project: 'Simulated x402 SettlementFacilitator', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa02', network: 'celo-mainnet', component: 'src/facilitator/FeeMath.sol', commit: 'c0ffee00000000000000000000000000000000002' },
+  'R-003': { project: 'Simulated RewardsDistributor', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa03', network: 'celo-mainnet', component: 'src/rewards/ClaimRouter.sol', commit: 'deadc0de00000000000000000000000000000003' },
+  'R-004': { project: 'Simulated VaultController', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa04', network: 'celo-mainnet', component: 'src/vault/WithdrawalRouter.sol', commit: 'deadc0de00000000000000000000000000000004' },
+  'R-005': { project: 'Simulated LendingCollateralManager', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa05', network: 'celo-mainnet', component: 'src/lending/CollateralOracle.sol', commit: 'feedface00000000000000000000000000000005' },
+  'R-006': { project: 'Simulated StablecoinRebalancer', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa06', network: 'celo-mainnet', component: 'src/rebalance/RouteExecutor.sol', commit: 'feedface00000000000000000000000000000006' },
+  'R-007': { project: 'Simulated PayoutSigner', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa07', network: 'celo-mainnet', component: 'src/payout/SignatureVault.sol', commit: 'baadf00d00000000000000000000000000000007' },
+  'R-008': { project: 'Simulated FeeRouter', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa08', network: 'celo-mainnet', component: 'src/fees/RefundMath.sol', commit: 'baadf00d00000000000000000000000000000008' },
+  'R-009': { project: 'Simulated RewardConfig', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa09', network: 'celo-mainnet', component: 'src/rewards/ConfigStore.sol', commit: '0ddba110000000000000000000000000000000009' },
+  'R-010': { project: 'Simulated SettlementEvents', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0a', network: 'celo-mainnet', component: 'src/settlement/SettlementEmitter.sol', commit: '0ddba11000000000000000000000000000000000a' },
+  'R-011': { project: 'Simulated ProxyAdminHandoff', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0b', network: 'celo-mainnet', component: 'src/admin/UpgradeProxy.sol', commit: 'fa11e00000000000000000000000000000000000b' },
+  'R-012': { project: 'Simulated TokenRecoveryModule', contract: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0c', network: 'celo-mainnet', component: 'src/recovery/RescueModule.sol', commit: '5ca11ab1e0000000000000000000000000000012' },
+};
+
 export const REPORTS = {
   'R-001': {
     title: 'Unbounded approval drift in Celo ecosystem token distributor',
@@ -115,6 +132,7 @@ const unlocked = {};
 
 // Format a full report as a standalone Markdown document (paid deliverable).
 export function formatReportMarkdown(id, report) {
+  const t = TARGETS[id] || {};
   return [
     `# [${report.severity}] ${report.title}`,
     '',
@@ -123,6 +141,18 @@ export function formatReportMarkdown(id, report) {
     `**Agent:** CeloSentry (ERC-8004 #9798, Celo mainnet)  `,
     `**Attribution tag:** ${ATTRIBUTION_TAG}  `,
     `**License:** CC BY 4.0 - share with attribution to CeloSentry`,
+    '',
+    '## Target',
+    '',
+    `| Field | Value |`,
+    `|-------|-------|`,
+    `| Project | ${t.project || 'n/a'} |`,
+    `| Contract | \`${t.contract || 'n/a'}\` |`,
+    `| Network | ${t.network || 'n/a'} |`,
+    `| Component | \`${t.component || 'n/a'}\` |`,
+    `| Commit | \`${t.commit || 'n/a'}\` |`,
+    '',
+    '> Simulated target: the report format is complete, but the target is a demo contract. Real findings reference verified deployments.',
     '',
     '## Summary',
     '',
@@ -201,7 +231,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (url.pathname === '/findings' && req.method === 'GET') {
-    return json(res, 200, { reports: REPORTS, ledger: { settlements: stats().settlements, findings: stats().findings } });
+    const listings = {};
+    for (const [id, r] of Object.entries(REPORTS)) {
+      listings[id] = {
+        title: r.title, severity: r.severity, priceCusd: r.priceCusd,
+        summary: r.summary, project: TARGETS[id]?.project || null,
+      };
+    }
+    return json(res, 200, { reports: listings, ledger: { settlements: stats().settlements, findings: stats().findings } });
   }
 
   const m = url.pathname.match(/^\/report\/(R-\d+)$/);
@@ -229,7 +266,7 @@ const server = http.createServer(async (req, res) => {
         accepts: x402Requirements(id),
       }, null, 2));
     }
-    return json(res, 200, { id, ...report, full: true, unlockedBy: un });
+    return json(res, 200, { id, ...report, target: TARGETS[id], full: true, unlockedBy: un });
   }
 
   // Download unlocked report as Markdown

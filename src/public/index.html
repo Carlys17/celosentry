@@ -118,6 +118,7 @@ async function renderReports(){
           <span class="tag ${rep.severity}">${rep.severity}</span>
           <b style="margin-left:8px">${rep.title}</b>
           <div class="summary">${rep.summary}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:6px">Target: ${rep.project || 'n/a'}</div>
           <div class="full" id="full-${id}" style="display:none"></div>
         </div>
         <div style="text-align:right">
@@ -210,6 +211,7 @@ async function loadFull(id){
     const el = document.getElementById('full-'+id);
     el.style.display='block';
     el.innerHTML = '<b>Full report</b><br>'+ (j.details||j.poc||'') +
+      (j.target ? '<div style="margin-top:8px;color:var(--muted);font-size:12px">Target: '+j.target.project+' · '+j.target.component+' · '+j.target.contract+'</div>' : '') +
       '<pre>'+JSON.stringify(j.unlockedBy||{}, null, 2)+'</pre>';
     const btn = document.getElementById('buy-'+id);
     if(btn){ btn.textContent='Purchased ✓'; btn.disabled=true; }
