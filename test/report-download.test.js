@@ -17,24 +17,24 @@ test('every report has a complete target (project, contract, component, commit)'
 test('markdown download includes the target table', () => {
   const output = formatReportMarkdown('R-003', REPORTS['R-003']);
   assert.match(output, /## Target/);
-  assert.match(output, /Simulated RewardsDistributor/);
-  assert.match(output, /0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa03/);
-  assert.match(output, /Simulated target/);
+  assert.match(output, /CeloSentry Demo Vault/);
+  assert.match(output, /0x29f065288a8d56cC2a6afA4ce1d64C80aCb2381e/);
+  assert.match(output, /Demo Lab/);
 });
 
-test('CRITICAL report costs 1 USD', () => {
+test('CRITICAL report costs 0.50 USD', () => {
   const w = priceWeiForReport('R-003');
-  assert.equal(w, '1000000000000000000'); // 1e18
+  assert.equal(w, '500000000000000000'); // 0.5e18
 });
 
 test('MEDIUM report costs 0.50 USD', () => {
   const w = priceWeiForReport('R-005');
-  assert.equal(w, '500000000000000000'); // 0.5e18
+  assert.equal(w, '300000000000000000'); // 0.3e18
 });
 
 test('LOW report costs 0.10 USD', () => {
   const w = priceWeiForReport('R-008');
-  assert.equal(w, '200000000000000000'); // 0.2e18
+  assert.equal(w, '250000000000000000'); // 0.25e18
 });
 
 test('unknown report falls back to PRICE_CUSD default 0.5', () => {
