@@ -56,6 +56,48 @@ Validation checklist: test zero, one-unit, maximum, and non-divisible quote valu
 // unlocked[reportId][payer] = { txHash, tagged, at }
 const unlocked = {};
 
+// Format a full report as a standalone Markdown document (paid deliverable).
+export function formatReportMarkdown(id, report) {
+  return [
+    `# [${report.severity}] ${report.title}`,
+    '',
+    `**Report ID:** ${id}  `,
+    `**Severity:** ${report.severity}  `,
+    `**Agent:** CeloSentry (ERC-8004 #9798, Celo mainnet)  `,
+    `**Attribution tag:** ${ATTRIBUTION_TAG}  `,
+    `**License:** CC BY 4.0 - share with attribution to CeloSentry`,
+    '',
+    '## Summary',
+    '',
+    report.summary,
+    '',
+    '## Impact',
+    '',
+    (report.details.split('\n\n').find(p => p.startsWith('Impact:')) || '').replace(/^Impact:\s*/, ''),
+    '',
+    '## Root cause',
+    '',
+    (report.details.split('\n\n').find(p => p.startsWith('Root cause:')) || '').replace(/^Root cause:\s*/, ''),
+    '',
+    '## Proof of concept',
+    '',
+    (report.details.split('\n\n').find(p => /^(Proof of concept|Reproduction):/.test(p)) || '').replace(/^(Proof of concept|Reproduction):\s*/, ''),
+    '',
+    '## Recommended fix',
+    '',
+    (report.details.split('\n\n').find(p => p.startsWith('Recommended fix:')) || '').replace(/^Recommended fix:\s*/, ''),
+    '',
+    '## Validation checklist',
+    '',
+    (report.details.split('\n\n').find(p => p.startsWith('Validation checklist:')) || '').replace(/^Validation checklist:\s*/, ''),
+    '',
+    '---',
+    '',
+    `Purchased via x402 settlement on Celo mainnet. Every settlement carries the ERC-8021 attribution tag \`${ATTRIBUTION_TAG}\`.`,
+    '',
+  ].join('\n');
+}
+
 function json(res, code, obj) {
   res.writeHead(code, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(obj, null, 2));
@@ -106,6 +148,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   const m = url.pathname.match(/^\/report\/(R-\d+)$/);
+  const md = url.pathname.match(/^\/download\/(R-\d+)\.md$/);
   if (m && req.method === 'GET') {
     const id = m[1];
     const report = REPORTS[id];
@@ -130,6 +173,28 @@ const server = http.createServer(async (req, res) => {
       }, null, 2));
     }
     return json(res, 200, { id, ...report, full: true, unlockedBy: un });
+  }
+
+  // Download unlocked report as Markdown
+  if (md && req.method === 'GET') {
+    const id = md[1];
+    const report = REPORTS[id];
+    if (!report) return json(res, 404, { error: 'unknown report' });
+    const payer = (url.searchParams.get('from') || '').toLowerCase();
+    const un = unlocked[id] || {};
+    if (payer && Object.keys(un).length === 0) {
+      const prior = loadLedger().settlements.find(s => s.from?.toLowerCase() === payer);
+      if (prior) un[payer] = { txHash: prior.txHash, tagged: prior.tagged, at: prior.recordedAt };
+    }
+    if (Object.keys(un).length === 0) {
+      return json(res, 402, { error: 'X-402: payment required', accepts: x402Requirements(id) });
+    }
+    const mdContent = formatReportMarkdown(id, report);
+    res.writeHead(200, {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${id}-${report.severity.toLowerCase()}-celosentry.md"`,
+    });
+    return res.end(mdContent);
   }
 
   if (url.pathname === '/settle' && req.method === 'POST') {
