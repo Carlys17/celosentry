@@ -31,6 +31,7 @@ export const REPORTS = {
   'R-001': {
     title: 'Unbounded approval drift in Celo ecosystem token distributor',
     severity: 'HIGH',
+    priceCusd: '0.50',
     summary: 'Distributor contract allows infinite approvals to drift after role rotation.',
     details: `Impact: HIGH. A spender approved by the distributor can retain an unlimited allowance after its operational role is rotated or revoked. If the spender key or contract is compromised, previously approved token balances remain drainable.
 
@@ -45,6 +46,7 @@ Validation checklist: inspect the distributor's allowance for every historical s
   'R-002': {
     title: 'cUSD fee-currency rounding leak in x402 facilitator flow',
     severity: 'MEDIUM',
+    priceCusd: '0.50',
     summary: 'Rounding direction leaks dust to the caller on partial settlements.',
     details: `Impact: MEDIUM. When a facilitator converts a requested fee into token base units, integer division rounds in one direction. Repeated partial settlements can leave a small remainder that is not allocated according to the quoted fee.
 

@@ -121,7 +121,7 @@ async function renderReports(){
           <div class="full" id="full-${id}" style="display:none"></div>
         </div>
         <div style="text-align:right">
-          <div class="price">${rep.priceCusd || '0.03'} cUSD</div>
+          <div class="price">${rep.priceCusd || '0.50'} cUSD</div>
           <button class="btn" id="buy-${id}" style="margin-top:10px">Buy report</button>
           <a id="dl-${id}" class="btn btn-download" style="margin-top:10px;margin-left:8px;display:none" download>Download .md</a>
         </div>
@@ -158,7 +158,7 @@ async function buyReport(id){
   const btn = document.getElementById('buy-'+id);
   btn.disabled = true; btn.textContent = 'Pay in wallet…';
   try{
-    const price = (reportsData[id] && reportsData[id].priceCusd) || '0.03';
+    const price = (reportsData[id] && reportsData[id].priceCusd) || '0.50';
     const wei = priceWei(price);
     // cUSD transfer: selector + recipient + amount, then ERC-8021 tag suffix
     const data =
