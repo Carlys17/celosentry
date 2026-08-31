@@ -14,7 +14,7 @@ test('MEDIUM report costs 0.50 USD', () => {
 
 test('LOW report costs 0.10 USD', () => {
   const w = priceWeiForReport('R-008');
-  assert.equal(w, '100000000000000000'); // 0.1e18
+  assert.equal(w, '200000000000000000'); // 0.2e18
 });
 
 test('unknown report falls back to PRICE_CUSD default 0.5', () => {

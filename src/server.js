@@ -31,7 +31,7 @@ export const REPORTS = {
   'R-001': {
     title: 'Unbounded approval drift in Celo ecosystem token distributor',
     severity: 'HIGH',
-    priceCusd: '0.50',
+    priceCusd: '0.80',
     summary: 'Distributor contract allows infinite approvals to drift after role rotation.',
     details: `Impact: HIGH. A spender approved by the distributor can retain an unlimited allowance after its operational role is rotated or revoked. If the spender key or contract is compromised, previously approved token balances remain drainable.
 
@@ -85,17 +85,17 @@ Validation checklist: test zero, one-unit, maximum, and non-divisible quote valu
   },
   'R-008': {
     title: 'Dust accumulation in fee refund calculation', severity: 'LOW',
-    priceCusd: '0.10', summary: 'Integer truncation leaves small unaccounted fee dust on repeated refunds.',
+    priceCusd: '0.20', summary: 'Integer truncation leaves small unaccounted fee dust on repeated refunds.',
     details: `Impact: LOW. Repeated small refunds can accumulate residual token units that are not transparently assigned.\n\nRoot cause: division truncates each refund independently without a remainder accumulator.\n\nReproduction: execute many non-divisible refund amounts and compare charged, refunded, and retained units.\n\nRecommended fix: document rounding, retain remainders per account, and expose reconciliation events.\n\nValidation checklist: test one-unit, non-divisible, maximum, and repeated refunds.`
   },
   'R-009': {
     title: 'Missing zero-address validation in reward configuration', severity: 'LOW',
-    priceCusd: '0.10', summary: 'An administrator can configure a zero token or recipient address.',
+    priceCusd: '0.20', summary: 'An administrator can configure a zero token or recipient address.',
     details: `Impact: LOW. Misconfiguration can permanently route rewards to an unusable address or break future claims.\n\nRoot cause: setter accepts address(0) without validation.\n\nReproduction: call the configuration setter with the zero address and observe successful state update.\n\nRecommended fix: reject zero addresses and emit a configuration-change event with old and new values.\n\nValidation checklist: cover every address setter and upgrade initialization path.`
   },
   'R-010': {
     title: 'Event omits effective recipient in fee settlement', severity: 'LOW',
-    priceCusd: '0.10', summary: 'Settlement events do not expose the final recipient used by downstream indexers.',
+    priceCusd: '0.20', summary: 'Settlement events do not expose the final recipient used by downstream indexers.',
     details: `Impact: LOW. Monitoring and accounting systems may attribute payments to the caller rather than the effective recipient.\n\nRoot cause: event schema emits caller and amount but omits the resolved recipient.\n\nReproduction: settle on behalf of another recipient and compare event fields with the actual token transfer.\n\nRecommended fix: add the resolved recipient as an indexed event field and update consumers.\n\nValidation checklist: test direct, delegated, and fee-on-behalf settlements.`
   },
   'R-011': {
