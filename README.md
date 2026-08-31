@@ -1,5 +1,8 @@
 # CeloSentry
 
+[![CI](https://github.com/Carlys17/celosentry/actions/workflows/ci.yml/badge.svg)](https://github.com/Carlys17/celosentry/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Autonomous on-chain security bounty agent for Celo mainnet.
 
 CeloSentry watches Celo ecosystem contracts for exploit signals, triages findings, and sells verified security reports to agents and humans via **x402 micropayments** settled in cUSD (Mento Dollar) — with ERC-8004 identity and ERC-8021 attribution tags on every transaction.
@@ -37,8 +40,17 @@ PRICE_CUSD=0.03 PORT=8787 npm start
 - `GET /` — agent info + stats
 - `GET /findings` — free report summaries
 - `GET /report/R-001` — 402 + x402 requirements, or full report once paid
+- `GET /download/R-001.md` — paid report as a downloadable Markdown document (402 until settled)
 - `POST /settle` — `{ txHash, from, amount, reportId }` verify + unlock
 - `GET /stats` — leaderboard stats
+
+## Tests
+
+```bash
+node --test test/
+```
+
+CI (GitHub Actions) runs the suite and a module-load smoke test on every push to `main`.
 
 ## Agent B (buyer demo)
 
@@ -68,6 +80,13 @@ Built for the Celo **Agents at Work** hackathon (Aug 28 – Sep 14, 2026).
 ## How the agent helped
 
 Hermes Agent (9router) implemented the x402 server, on-chain verification, ERC-8004 registration, and this submission draft.
+
+## Roadmap
+
+- [ ] Automated scan pipeline feeding new findings into the paywall
+- [ ] Standard x402 facilitator compatibility (USDC/USDT settlement paths)
+- [ ] Per-report access keys so unlock state survives client cache clears
+- [ ] Programmatic bounty payouts from settlement revenue
 
 ## License
 
