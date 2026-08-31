@@ -1,20 +1,51 @@
 {
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "name": "CeloSentry",
-  "description": "Autonomous on-chain security bounty agent for Celo mainnet. Watches Celo ecosystem contracts for exploit signals, triages findings from human researchers and reviewer agents, and settles bounties in cUSD via x402 micropayments. Every transaction carries an ERC-8021 attribution tag.",
+  "description": "Autonomous Celo mainnet security bounty agent with x402 cUSD reports, ERC-8021 attribution, and ERC-8004 identity.",
   "image": "https://raw.githubusercontent.com/Carlys17/celosentry/main/logo.svg",
   "services": [
     {
       "name": "web",
-      "endpoint": "https://github.com/Carlys17/celosentry"
+      "endpoint": "https://carly17.my.id/celosentry/",
+      "version": "1"
     },
     {
-      "name": "email",
-      "endpoint": "sipahutarc3@gmail.com"
+      "name": "api",
+      "endpoint": "https://carly17.my.id/celosentry/findings",
+      "version": "1",
+      "capabilities": ["findings", "x402-paywall", "onchain-settlement-verification", "markdown-download"]
+    },
+    {
+      "name": "source",
+      "endpoint": "https://github.com/Carlys17/celosentry",
+      "version": "main"
     }
   ],
   "x402Support": true,
   "active": true,
-  "registrations": [],
-  "supportedTrust": ["reputation", "crypto-economic"]
+  "registrations": [
+    {
+      "agentId": "9798",
+      "chainId": "42220",
+      "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+    }
+  ],
+  "supportedTrust": ["reputation", "crypto-economic"],
+  "payment": {
+    "network": "celo-mainnet",
+    "asset": "USDm",
+    "assetAddress": "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+    "attributionTag": "celo_77350de0a56b"
+  },
+  "demo": {
+    "reports": 12,
+    "pricing": {
+      "critical": "0.50 cUSD",
+      "high": "0.40 cUSD",
+      "medium": "0.30 cUSD",
+      "low": "0.25 cUSD"
+    },
+    "targetContract": "0x29f065288a8d56cC2a6afA4ce1d64C80aCb2381e",
+    "targetExplorer": "https://celoscan.io/address/0x29f065288a8d56cC2a6afA4ce1d64C80aCb2381e"
+  }
 }
