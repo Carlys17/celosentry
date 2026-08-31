@@ -43,7 +43,7 @@ export function x402Requirements(reportId) {
       scheme: 'exact',
       network: 'celo',
       maxAmountRequired: PRICE_WEI,
-      resource: `https://celosentry.example/report/${reportId}`,
+      resource: `https://carly17.my.id/celosentry/report/${reportId}`,
       description: `CeloSentry security report ${reportId} (cUSD x402)`,
       mimeType: 'application/json',
       payTo: ADDRESSES.agentWallet,
