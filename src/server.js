@@ -112,6 +112,14 @@ const server = http.createServer(async (req, res) => {
     if (!report) return json(res, 404, { error: 'unknown report' });
 
     const un = unlocked[id] || {};
+    // Restore unlock state after restart from the persisted settlement ledger.
+    const payer = (url.searchParams.get('from') || '').toLowerCase();
+    if (payer && Object.keys(un).length === 0) {
+      const prior = loadLedger().settlements.find(s => s.from?.toLowerCase() === payer);
+      if (prior) {
+        un[payer] = { txHash: prior.txHash, tagged: prior.tagged, at: prior.recordedAt };
+      }
+    }
     if (Object.keys(un).length === 0) {
       // 402 Payment Required - x402
       res.writeHead(402, { 'Content-Type': 'application/json' });

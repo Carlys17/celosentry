@@ -197,7 +197,7 @@ function waitForTx(hash){
 }
 
 async function loadFull(id){
-  const r = await fetch(API + '/report/' + id);
+  const r = await fetch(API + '/report/' + id + (account ? '?from=' + encodeURIComponent(account) : ''));
   const j = await r.json();
   if(r.status===200 && j.full){
     const el = document.getElementById('full-'+id);
