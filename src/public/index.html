@@ -86,8 +86,9 @@ const CELO_CHAIN_ID = '0xa4ec'; // 42220
 const CUSD = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
 const AGENT_WALLET = '0xBae72FdEF2fC7F66Ef626c5c18e09BC11d78D977';
 const ATTR_SUFFIX_HEX = '63656c6f5f373733353064653061353662110080218021802180218021802180218021';
-const PRICE_WEI = '30000000000000000';
 let account = null;
+const reportsData = {};
+function priceWei(priceCusd) { return BigInt(Math.floor(parseFloat(priceCusd) * 1e18)).toString(); }
 const unlockedCache = {};
 
 function setStatus(kind, msg){ const s=document.getElementById('status'); s.className=kind; s.innerHTML=msg; }
@@ -108,6 +109,7 @@ async function renderReports(){
   const wrap = document.getElementById('reports');
   wrap.innerHTML = '';
   for (const [id, rep] of Object.entries(d.reports)){
+    reportsData[id] = rep;
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -119,7 +121,7 @@ async function renderReports(){
           <div class="full" id="full-${id}" style="display:none"></div>
         </div>
         <div style="text-align:right">
-          <div class="price">0.03 cUSD</div>
+          <div class="price">${rep.priceCusd || '0.03'} cUSD</div>
           <button class="btn" id="buy-${id}" style="margin-top:10px">Buy report</button>
           <a id="dl-${id}" class="btn btn-download" style="margin-top:10px;margin-left:8px;display:none" download>Download .md</a>
         </div>
@@ -156,11 +158,13 @@ async function buyReport(id){
   const btn = document.getElementById('buy-'+id);
   btn.disabled = true; btn.textContent = 'Pay in wallet…';
   try{
+    const price = (reportsData[id] && reportsData[id].priceCusd) || '0.03';
+    const wei = priceWei(price);
     // cUSD transfer: selector + recipient + amount, then ERC-8021 tag suffix
     const data =
       '0xa9059cbb' +
       AGENT_WALLET.toLowerCase().replace(/^0x/,'').padStart(64,'0') +
-      BigInt(PRICE_WEI).toString(16).padStart(64,'0') +
+      BigInt(wei).toString(16).padStart(64,'0') +
       ATTR_SUFFIX_HEX;
     const txHash = await window.ethereum.request({
       method:'eth_sendTransaction',
@@ -171,7 +175,7 @@ async function buyReport(id){
     setStatus('info','Confirmed on Celo mainnet. Verifying settlement…');
     const r = await fetch(API + '/settle', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ txHash, from: account, amount: PRICE_WEI, reportId: id })
+      body: JSON.stringify({ txHash, from: account, reportId: id })
     });
     const j = await r.json();
     if(!r.ok){ throw new Error(j.error || 'verification failed'); }
