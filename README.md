@@ -31,7 +31,9 @@ npm install
 PRICE_CUSD=0.03 PORT=8787 npm start
 ```
 
-Endpoints:
+**Web UI**: open the same URL in a browser to use the wallet-based interface. Click "Connect Wallet" (any EVM wallet works on Celo mainnet), pick a report, click "Buy report" — your wallet sends 0.03 cUSD (Mento Dollar) to the agent with the ERC-8021 attribution tag, and the report unlocks on the same page.
+
+**API for agents**:
 - `GET /` — agent info + stats
 - `GET /findings` — free report summaries
 - `GET /report/R-001` — 402 + x402 requirements, or full report once paid
