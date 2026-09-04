@@ -15,7 +15,7 @@ CeloSentry watches Celo ecosystem contracts for exploit signals, triages finding
 curl -i https://carly17.my.id/celosentry/report/R-001
 # HTTP/2 402
 # x402-version: 1
-# accepts: { scheme: exact, network: celo, maxAmountRequired: 0.40 cUSD, payTo: 0xBae72..., extra.attributionTag: celo_77350de0a56b }
+# accepts: { scheme: exact, network: celo, maxAmountRequired: 0.01 cUSD, payTo: 0xBae72..., extra.attributionTag: celo_77350de0a56b }
 ```
 
 ## What's interesting
@@ -45,7 +45,7 @@ _Pay and unlock (need a Celo mainnet wallet with cUSD):_
 
 ```bash
 # Clone, set up an agent wallet with cUSD, then:
-node src/agentb.js R-001 /path/to/pk.env 0.40
+node src/agentb.js R-001 /path/to/pk.env 0.01
 # → sends cUSD to 0xBae72... with attribution tag, then unlocks the report
 ```
 
@@ -69,18 +69,18 @@ The web UI is the same URL opened in a browser: connect any Celo-compatible wall
 unlock report + log settlement to ledger.json
 ```
 
-## Available reports (12, priced 0.25–0.50 cUSD each)
+## Available reports (12, flat 0.01 cUSD each)
 
 Each report is a finding on a real Celo ecosystem contract, triaged and priced.
 
 | ID | Severity | Title | Price (cUSD) |
 |---|---|---|---|
-| R-001 | HIGH | Unbounded approval drift in Celo ecosystem token distributor | 0.40 |
-| R-002 | MEDIUM | cUSD fee-currency rounding leak in x402 facilitator flow | 0.30 |
-| R-003 | CRITICAL | Critical authorization bypass in Celo rewards distributor | 0.50 |
-| R-004 | CRITICAL | Critical emergency pause bypass through alternate withdrawal path | 0.50 |
-| R-011 | CRITICAL | Critical upgrade authorization gap in proxy admin handoff | 0.50 |
-| … | … | 7 more (MEDIUM/LOW) | 0.25–0.30 |
+| R-001 | HIGH | Unbounded approval drift in Celo ecosystem token distributor | 0.01 |
+| R-002 | MEDIUM | cUSD fee-currency rounding leak in x402 facilitator flow | 0.01 |
+| R-003 | CRITICAL | Critical authorization bypass in Celo rewards distributor | 0.01 |
+| R-004 | CRITICAL | Critical emergency pause bypass through alternate withdrawal path | 0.01 |
+| R-011 | CRITICAL | Critical upgrade authorization gap in proxy admin handoff | 0.01 |
+| … | … | 7 more (MEDIUM/LOW) | 0.01 |
 
 Full list at `GET /findings`.
 

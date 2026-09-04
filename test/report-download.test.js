@@ -22,24 +22,15 @@ test('markdown download includes the target table', () => {
   assert.match(output, /Demo Lab/);
 });
 
-test('CRITICAL report costs 0.50 USD', () => {
-  const w = priceWeiForReport('R-003');
-  assert.equal(w, '500000000000000000'); // 0.5e18
+test('every report is priced at the flat 0.01 cUSD demo rate', () => {
+  for (const id of Object.keys(REPORTS)) {
+    assert.equal(priceWeiForReport(id), '10000000000000000', `${id}: unexpected price`);
+  }
 });
 
-test('MEDIUM report costs 0.50 USD', () => {
-  const w = priceWeiForReport('R-005');
-  assert.equal(w, '300000000000000000'); // 0.3e18
-});
-
-test('LOW report costs 0.10 USD', () => {
-  const w = priceWeiForReport('R-008');
-  assert.equal(w, '250000000000000000'); // 0.25e18
-});
-
-test('unknown report falls back to PRICE_CUSD default 0.5', () => {
-  const w = priceWeiForReport('R-999');
-  assert.equal(w, '500000000000000000'); // default PRICE_CUSD 0.5
+test('unknown report falls back to the PRICE_CUSD default', () => {
+  const expected = BigInt(Math.floor(parseFloat(process.env.PRICE_CUSD || '0.5') * 1e18)).toString();
+  assert.equal(priceWeiForReport('R-999'), expected);
 });
 
 test('formats a complete security report as markdown', () => {
